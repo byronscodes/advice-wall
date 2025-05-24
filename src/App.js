@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
+import AddDialog from './AddDialog';
+import React, { useState } from 'react';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -25,13 +27,19 @@ const analytics = getAnalytics(app);
 const database = getDatabase(app);
 
 function App() {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleOpen = () => setDialogOpen(true);
+  const handleClose = () => setDialogOpen(false);
+
   return (
     <div className="App">
       <header className="App-header">
         <div className="titleDiv">
           <a href="#" className="title">Advice Wall</a>
         </div>
-        <button className="add"><i className="material-symbols-outlined">add</i></button>
+        <button className="add" onClick={handleOpen}><span className="material-symbols-outlined">add</span></button>
+        <AddDialog open={dialogOpen} onClose={handleClose} />
       </header>
     </div>
   );
