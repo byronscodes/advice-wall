@@ -1,12 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
 import AddDialog from './AddDialog';
-import React, { useState } from 'react';
+import NotesList from './NotesList';
+import SelectedNote from './SelectedNote'
+import React, { useState, useEffect } from 'react';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getDatabase } from "firebase/database";
+import { getDatabase, ref, onValue } from "firebase/database";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -32,6 +34,24 @@ function App() {
   const handleOpen = () => setDialogOpen(true);
   const handleClose = () => setDialogOpen(false);
 
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    const db = getDatabase();
+    const notesRef = ref(db, 'notes');
+    const unsubscribe = onValue(notesRef, (snapshot) => {
+      const data = snapshot.val();
+      const noteList = data
+        ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
+        : [];
+      setNotes(noteList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const [selectedNote, setSelectedNote] = useState(null);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -41,8 +61,21 @@ function App() {
         <button className="add" onClick={handleOpen}><span className="material-symbols-outlined">add</span></button>
         <AddDialog open={dialogOpen} onClose={handleClose} />
       </header>
+      <div className="notesMap">
+        <NotesList notes={notes} setSelectedNote={setSelectedNote} />
+        <SelectedNote selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
+      </div>
     </div>
   );
+}
+
+export function getDeviceId() {
+  let id = localStorage.getItem('deviceId');
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem('deviceId', id);
+  }
+  return id;
 }
 
 export default App;

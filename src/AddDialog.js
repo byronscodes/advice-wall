@@ -4,16 +4,19 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
-import { getDatabase, ref, set, push } from "firebase/database";
+import { getDeviceId } from './App'; 
+import { getDatabase, ref, push } from "firebase/database";
 
 export default function AddDialog({ open, onClose }) {
     return (
         <Dialog
             open={open}
             onClose={onClose}
+            className="addDialog"
             slotProps={{
                 paper: {
                     component: 'form',
@@ -28,14 +31,32 @@ export default function AddDialog({ open, onClose }) {
                         push(notesRef, {
                             content: content,
                             title: title,
-                            timestamp: Date.now()
+                            timestamp: Date.now(),
+                            creator: getDeviceId(),
+                            likes: {
+                                count: 0,
+                                voters: {},
+                            },
                         });
                         onClose();
                     },
                 },
             }}
         >
-            <DialogTitle>New Note</DialogTitle>
+            <DialogTitle>
+                New Note
+                <IconButton
+                aria-label="close"
+                onClick={() => onClose()}
+                sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+                }}>
+                <CloseIcon />
+                </IconButton>
+            </DialogTitle>
             <DialogContent>
                 <TextField
                     name="title"
@@ -56,7 +77,6 @@ export default function AddDialog({ open, onClose }) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
                 <Button type="submit">Submit</Button>
             </DialogActions>
         </Dialog>
