@@ -37,6 +37,10 @@ export default function AddDialog({ open, onClose }) {
                                 count: 0,
                                 voters: {},
                             },
+                            dislikes: {
+                                count: 0,
+                                voters: {},
+                            },
                         });
                         onClose();
                     },
