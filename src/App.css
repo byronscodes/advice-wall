@@ -71,13 +71,9 @@ html, body, #root, .App {
   transition: all 125ms ease-in;
 }
 
-/* .selectedNote {
-  width: clamp(200px, 30vw, 500px);
-  height: clamp(200px, 15vh, 400px);
-  position: fixed;
-  top: 100vh;
-  left: 50vw;
-} */
+.note:hover {
+  cursor: pointer;
+}
 
 .add:hover {
   cursor: pointer;

@@ -12,6 +12,8 @@ import React, { useState, useEffect } from 'react';
 import { getDeviceId } from './App';
 import { getDatabase, ref, update, get, remove, onValue } from "firebase/database";
 
+
+// Likes note function
 function likeNote(noteId) {
     const db = getDatabase();
     const deviceId = getDeviceId();
@@ -49,6 +51,7 @@ function likeNote(noteId) {
     });
 }
 
+// Dislikes note function
 function dislikeNote(noteId) {
     const db = getDatabase();
     const deviceId = getDeviceId();
@@ -87,8 +90,10 @@ function dislikeNote(noteId) {
 }
 
 export default function SelectedNote({ selectedNote, setSelectedNote }) {
+    // State to hold the live note data
     const [liveNote, setLiveNote] = useState(null);
 
+    // Effect to fetch the live note data from Firebase when selectedNote changes
     useEffect(() => {
         if (!selectedNote?.id) return;
         const db = getDatabase();
@@ -103,98 +108,169 @@ export default function SelectedNote({ selectedNote, setSelectedNote }) {
         return () => unsubscribe();
     }, [selectedNote?.id]);
 
-    useEffect(() => {
-        console.log("Rendering with liveNote:", liveNote);
-    }, [liveNote]);
+    // State to hold the time left for the note
+    const [timeLeft, setTimeLeft] = useState(1);
 
+    // Effect to update the time left and handle note expiration
+    useEffect(() => {
+        if (!liveNote?.expiresAt) return;
+
+        const updateTimeLeft = () => {
+            const now = Date.now();
+            const remaining = Math.max(0, liveNote.expiresAt - now);
+            setTimeLeft(remaining);
+
+            // If the time left is less than or equal to zero, remove the note
+            if (remaining <= 0) {
+                const db = getDatabase();
+                remove(ref(db, 'notes/' + liveNote.id));
+                setSelectedNote(null);
+                setTimeLeft(1);
+            }
+        };
+
+        updateTimeLeft();
+
+        const interval = setInterval(updateTimeLeft, 1000);
+
+        // Check if the note is not selected or if it has expired
+        if (selectedNote === null) {
+            clearInterval(interval);
+            return;
+        }
+
+        return () => clearInterval(interval);
+    }, [liveNote?.expiresAt, selectedNote])
+
+    const hours = Math.floor(timeLeft / 3600000);
+    const minutes = Math.floor(timeLeft / 60000);
+    const seconds = Math.floor((timeLeft % 60000) / 1000);
+
+    // State to manage the confirmation dialog for deletion
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     return (
-        <Dialog
-            open={selectedNote !== null}
-            onClose={() => setSelectedNote(null)}
-            className="selectedNote"
-            transitionDuration={0}
-            slotProps={{
-                container: {
-                    sx: {
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+        <div>
+            {/* Confirmation dialog for deletion */}
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this note? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+                    <Button
+                        color="error"
+                        onClick={() => {
+                            const db = getDatabase();
+                            remove(ref(db, 'notes/' + selectedNote?.id));
+                            setConfirmOpen(false);
+                            setSelectedNote(null);
+                        }}
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* Main dialog for displaying the selected note */}
+            <Dialog
+                open={selectedNote !== null}
+                onClose={() => setSelectedNote(null)}
+                className="selectedNote"
+                transitionDuration={0}
+                slotProps={{
+                    container: {
+                        sx: {
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        },
                     },
-                },
-                paper: {
-                    component: 'form',
-                    onSubmit: (event) => {
-                        event.preventDefault();
-                        const db = getDatabase();
-                        remove(ref(db, 'notes/' + selectedNote?.id))
-                        setSelectedNote(null);
+                    paper: {
+                        component: 'form',
+                        onSubmit: (event) => {
+                            event.preventDefault();
+                            setConfirmOpen(true);
+                        },
+                        sx: {
+                            width: 'clamp(300px, 45vw, 550px)',
+                            height: 'clamp(200px, 45vh, 500px)',
+
+                        }
                     },
-                    sx: {
-                        width: 'clamp(300px, 45vw, 550px)',
-                        height: 'clamp(200px, 45vh, 500px)',
+                }}
 
-                    }
-                },
-            }}
-
-        >
-            <DialogContent>
-                <DialogTitle sx={{ textAlign: 'center' }}>
-                    {liveNote?.title}
-                    <IconButton
-                        aria-label="close"
-                        onClick={() => setSelectedNote(null)}
-                        sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8,
-                            color: (theme) => theme.palette.grey[500],
-                        }}>
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContentText sx={{ textAlign: 'center' }}>
-                    <p>{liveNote?.content}</p>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                {liveNote?.likes?.voters?.[getDeviceId()] ? (
-                    <Button onClick={() => likeNote(liveNote.id)}>
-                        <span className="material-symbols-outlined" style={{ color: 'green' }}>
-                            arrow_drop_up
-                        </span>
-                        <span>{liveNote?.likes?.count || 0}</span>
-                    </Button>
-                ) : (
-                    <Button onClick={() => likeNote(liveNote.id)}>
-                        <span className="material-symbols-outlined" style={{ color: 'gray' }}>
-                            arrow_drop_up
-                        </span>
-                        <span>{liveNote?.likes?.count || 0}</span>
-                    </Button>
-                )}
-                {liveNote?.dislikes?.voters?.[getDeviceId()] ? (
-                    <Button onClick={() => dislikeNote(liveNote.id)}>
-                        <span className="material-symbols-outlined" style={{ color: 'red' }}>
-                            arrow_drop_down
-                        </span>
-                        <span>{liveNote?.dislikes?.count || 0}</span>
-                    </Button>
-                ) : (
-                    <Button onClick={() => dislikeNote(liveNote.id)}>
-                        <span className="material-symbols-outlined" style={{ color: 'gray' }}>
-                            arrow_drop_down
-                        </span>
-                        <span>{liveNote?.dislikes?.count || 0}</span>
-                    </Button>
-                )}
-                {liveNote?.creator === getDeviceId() && (
-                    <Button type="submit" color="error">
-                        <DeleteIcon />
-                    </Button>
-                )}
-            </DialogActions>
-        </Dialog>
+            >
+                <DialogContent>
+                    <DialogTitle sx={{ textAlign: 'center' }}>
+                        <DialogContentText
+                            sx={{
+                                position: 'absolute',
+                                left: 12,
+                                top: 10,
+                                color: (theme) => theme.palette.grey[500],
+                            }}>
+                            {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+                        </DialogContentText>
+                        {liveNote?.title}
+                        <IconButton
+                            aria-label="close"
+                            onClick={() => setSelectedNote(null)}
+                            sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: 8,
+                                color: (theme) => theme.palette.grey[500],
+                            }}>
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContentText sx={{ textAlign: 'center' }}>
+                        <span>{liveNote?.content}</span>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div sx={{ display: 'flex' }}>
+                        {liveNote?.likes?.voters?.[getDeviceId()] ? (
+                            <Button onClick={() => likeNote(liveNote.id)}>
+                                <span className="material-symbols-outlined" style={{ color: 'green' }}>
+                                    arrow_drop_up
+                                </span>
+                                <span>{liveNote?.likes?.count || 0}</span>
+                            </Button>
+                        ) : (
+                            <Button onClick={() => likeNote(liveNote.id)}>
+                                <span className="material-symbols-outlined" style={{ color: 'gray' }}>
+                                    arrow_drop_up
+                                </span>
+                                <span>{liveNote?.likes?.count || 0}</span>
+                            </Button>
+                        )}
+                        {liveNote?.dislikes?.voters?.[getDeviceId()] ? (
+                            <Button onClick={() => dislikeNote(liveNote.id)}>
+                                <span className="material-symbols-outlined" style={{ color: 'red' }}>
+                                    arrow_drop_down
+                                </span>
+                                <span>{liveNote?.dislikes?.count || 0}</span>
+                            </Button>
+                        ) : (
+                            <Button onClick={() => dislikeNote(liveNote.id)}>
+                                <span className="material-symbols-outlined" style={{ color: 'gray' }}>
+                                    arrow_drop_down
+                                </span>
+                                <span>{liveNote?.dislikes?.count || 0}</span>
+                            </Button>
+                        )}
+                    </div>
+                    {liveNote?.creator === getDeviceId() && (
+                        <Button type="submit" color="error">
+                            <DeleteIcon />
+                        </Button>
+                    )}
+                </DialogActions>
+            </Dialog>
+        </div>
     );
 }

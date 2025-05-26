@@ -5,10 +5,11 @@ import NotesList from './NotesList';
 import SelectedNote from './SelectedNote'
 import React, { useState, useEffect } from 'react';
 
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, remove, get } from "firebase/database";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -41,13 +42,37 @@ function App() {
     const notesRef = ref(db, 'notes');
     const unsubscribe = onValue(notesRef, (snapshot) => {
       const data = snapshot.val();
-      const noteList = data
-        ? Object.entries(data).map(([id, value]) => ({ id, ...value }))
-        : [];
+      if (!data) return;
+      Object.entries(data).forEach(([id, note]) => {
+        if (note.expiresAt && note.expiresAt < Date.now()) {
+          remove(ref(db, `notes/${id}`));
+        }
+      });
+      const noteList = Object.entries(data).map(([id, value]) => ({ id, ...value }));
       setNotes(noteList);
     });
 
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const db = getDatabase();
+
+    const interval = setInterval(() => {
+      const notesRef = ref(db, 'notes');
+      get(notesRef).then((snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        Object.entries(data).forEach(([id, note]) => {
+          if (note.expiresAt && note.expiresAt < Date.now()) {
+            remove(ref(db, `notes/${id}`));
+          }
+        });
+      });
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const [selectedNote, setSelectedNote] = useState(null);
