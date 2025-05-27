@@ -87,10 +87,10 @@ function App() {
         </div>
         <button className="add" onClick={handleOpen}><span className="material-symbols-outlined">add</span></button>
         <AddDialog open={dialogOpen} onClose={handleClose} />
+        <SelectedNote selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
       </header>
       <div className="notesMap">
         <NoteCloud notes={notes} setSelectedNote={setSelectedNote} />
-        <SelectedNote selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
       </div>
       <div className="cloudSelector">
         <CloudSelector cloudMode={cloudMode} setCloudMode={setCloudMode}/>

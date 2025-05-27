@@ -13,7 +13,7 @@ export default function CloudSelector({ cloudMode, setCloudMode }) {
       color="primary"
       fullWidth
       size="small"
-      sx ={{ backgroundColor: 'white', borderRadius: '8px', width: 'clamp(250px, 10vw, 300px)', float: 'right', marginRight: '20px', marginTop: '10px' }}
+      sx ={{ backgroundColor: 'white', borderRadius: '8px', width: 'clamp(250px, 10vw, 300px)', float: 'right', margin: '20px'}}
     >
       <ToggleButton value="clustered" sx={{ textTransform: 'none'}}>Cloud</ToggleButton>
       <ToggleButton value="static" sx={{ textTransform: 'none'}}>Space</ToggleButton>

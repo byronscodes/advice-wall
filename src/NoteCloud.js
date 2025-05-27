@@ -50,39 +50,41 @@ export default function NoteCloud({ notes, cloudMode, setSelectedNote }) {
             graphData={graphData}
             nodeColor={"white"}
             nodeCanvasObject={(node, ctx, globalScale) => {
-                const size = 60;
-                ctx.save();
-                ctx.translate(node.x, node.y);
+                const boxWidth = 30;
+                const boxHeight = 30;
 
-                // Content preview
+                const x = node.x - boxWidth / 2;
+                const y = node.y - boxHeight / 2;
+
                 ctx.fillStyle = 'white';
-                ctx.fillRect(node.x - 30, node.y - 30, 30, 30);
+                ctx.fillRect(x, y, boxWidth, boxHeight);
 
                 ctx.fillStyle = 'black';
-                ctx.font = `${19 / globalScale}px Inter`;
+                ctx.font = `${19 / globalScale}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.justifyContent = 'center';
-                ctx.fillText(node.content.slice(0, 20), 0, size / 2 + 12);
+                ctx.fillText(node.content.slice(0, 20), node.x, node.y);
 
                 ctx.strokeStyle = 'black';
                 ctx.lineWidth = 0.25;
-                ctx.strokeRect(node.x - 30, node.y - 30, 30, 30);
-
-                ctx.restore();
+                ctx.strokeRect(x, y, boxWidth, boxHeight);
             }}
             nodePointerAreaPaint={(node, color, ctx) => {
                 // Define clickable/hover area
+                const boxWidth = 30;
+                const boxHeight = 30;
+
+                const x = node.x - boxWidth / 2;
+                const y = node.y - boxHeight / 2;
+
                 ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, 30, 0, 2 * Math.PI, false);
-                ctx.fill();
+                ctx.fillRect(x, y, boxWidth, boxHeight);
             }}
             onNodeClick={(node) => {
                 setSelectedNote(node);
-                console.log('Clicked note:', node);
             }}
-            width={window.innerWidth - 100}
-            height={window.innerHeight - 300}
+            width={window.innerWidth - 4}
+            height={window.innerHeight}
         />
     );
 }
