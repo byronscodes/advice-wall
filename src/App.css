@@ -65,9 +65,9 @@ html, body, #root, .App {
   background-color: white;
   border: 1px solid rgb(227, 226, 226);
   border-radius: 50%;
-  width: clamp(48px, 8vw, 70px);
-  height: clamp(48px, 8vw, 70px);
-  margin: 2vw;
+  width: clamp(60px, 8vw, 70px);
+  height: clamp(60px, 8vw, 70px);
+  margin: 3vw;
   transition: all 125ms ease-in;
 }
 

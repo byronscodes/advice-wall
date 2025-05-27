@@ -1,10 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
 import AddDialog from './AddDialog';
-import NotesList from './NotesList';
+import NoteList from './NotesList';
+import NoteCloud from './NoteCloud';
 import SelectedNote from './SelectedNote'
+import CloudSelector from './CloudSelector';
 import React, { useState, useEffect } from 'react';
-
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -77,6 +77,8 @@ function App() {
 
   const [selectedNote, setSelectedNote] = useState(null);
 
+  const [cloudMode, setCloudMode] = useState('clustered');
+
   return (
     <div className="App">
       <header className="App-header">
@@ -87,8 +89,11 @@ function App() {
         <AddDialog open={dialogOpen} onClose={handleClose} />
       </header>
       <div className="notesMap">
-        <NotesList notes={notes} setSelectedNote={setSelectedNote} />
+        <NoteCloud notes={notes} setSelectedNote={setSelectedNote} />
         <SelectedNote selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
+      </div>
+      <div className="cloudSelector">
+        <CloudSelector cloudMode={cloudMode} setCloudMode={setCloudMode}/>
       </div>
     </div>
   );

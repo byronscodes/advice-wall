@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState, useEffect } from 'react';
+import { format } from 'timeago.js';
 
 import { getDeviceId } from './App';
 import { getDatabase, ref, update, get, remove, onValue } from "firebase/database";
@@ -131,7 +132,7 @@ export default function SelectedNote({ selectedNote, setSelectedNote }) {
 
         updateTimeLeft();
 
-        const interval = setInterval(updateTimeLeft, 1000);
+        const interval = setInterval(updateTimeLeft, 60000);
 
         // Check if the note is not selected or if it has expired
         if (selectedNote === null) {
@@ -143,7 +144,7 @@ export default function SelectedNote({ selectedNote, setSelectedNote }) {
     }, [liveNote?.expiresAt, selectedNote])
 
     const hours = Math.floor(timeLeft / 3600000);
-    const minutes = Math.floor(timeLeft / 60000);
+    const minutes = Math.floor((timeLeft % 3600000) / 60000);
     const seconds = Math.floor((timeLeft % 60000) / 1000);
 
     // State to manage the confirmation dialog for deletion
@@ -212,7 +213,8 @@ export default function SelectedNote({ selectedNote, setSelectedNote }) {
                                 top: 10,
                                 color: (theme) => theme.palette.grey[500],
                             }}>
-                            {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+                            {/* TIMER: {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')} */}
+                            {format(liveNote?.timestamp)}
                         </DialogContentText>
                         {liveNote?.title}
                         <IconButton

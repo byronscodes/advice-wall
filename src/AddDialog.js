@@ -41,7 +41,7 @@ export default function AddDialog({ open, onClose }) {
                                 count: 0,
                                 voters: {},
                             },
-                            expiresAt: Date.now() + 5 * 1000,
+                            expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
                         });
                         onClose();
                     },
