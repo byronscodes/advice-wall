@@ -2,6 +2,7 @@ import './App.css';
 import AddDialog from './AddDialog';
 import NoteList from './NotesList';
 import NoteCloud from './NoteCloud';
+import D3NoteCloud from './D3NoteCloud';
 import SelectedNote from './SelectedNote'
 import CloudSelector from './CloudSelector';
 import React, { useState, useEffect } from 'react';
@@ -90,7 +91,7 @@ function App() {
         <SelectedNote selectedNote={selectedNote} setSelectedNote={setSelectedNote} />
       </header>
       <div className="notesMap">
-        <NoteCloud notes={notes} setSelectedNote={setSelectedNote} />
+        <D3NoteCloud notes={notes} setSelectedNote={setSelectedNote} cloudMode={cloudMode}/>
       </div>
       <div className="cloudSelector">
         <CloudSelector cloudMode={cloudMode} setCloudMode={setCloudMode}/>

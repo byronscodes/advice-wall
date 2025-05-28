@@ -7,6 +7,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import React, { useState, useEffect } from 'react';
 import { format } from 'timeago.js';
 
@@ -236,40 +238,53 @@ export default function SelectedNote({ selectedNote, setSelectedNote }) {
                 <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div sx={{ display: 'flex' }}>
                         {liveNote?.likes?.voters?.[getDeviceId()] ? (
-                            <Button onClick={() => likeNote(liveNote.id)}>
-                                <span className="material-symbols-outlined" style={{ color: 'green' }}>
-                                    arrow_drop_up
-                                </span>
-                                <span>{liveNote?.likes?.count || 0}</span>
-                            </Button>
+                            <IconButton
+                                aria-label="like"
+                                sx={{
+                                    width: '60px',
+                                    height: '60px',
+                                }}
+                                onClick={() => likeNote(liveNote.id)}>
+                                <ArrowDropUpIcon sx={{ width: '40px', height: '40px', color: 'green' }} />
+                            </IconButton>
                         ) : (
-                            <Button onClick={() => likeNote(liveNote.id)}>
-                                <span className="material-symbols-outlined" style={{ color: 'gray' }}>
-                                    arrow_drop_up
-                                </span>
-                                <span>{liveNote?.likes?.count || 0}</span>
-                            </Button>
+                            <IconButton
+                                aria-label="like"
+                                sx={{
+                                    width: '60px',
+                                    height: '60px',
+                                }}
+                                onClick={() => likeNote(liveNote.id)}>
+                                <ArrowDropUpIcon sx={{ width: '40px', height: '40px', color: 'gray' }} />
+                            </IconButton>
                         )}
+                        <span style={{ display: 'inline-block', minWidth: 15, textAlign: 'center' }}>{liveNote?.likes.count - liveNote?.dislikes.count || 0}</span>
                         {liveNote?.dislikes?.voters?.[getDeviceId()] ? (
-                            <Button onClick={() => dislikeNote(liveNote.id)}>
-                                <span className="material-symbols-outlined" style={{ color: 'red' }}>
-                                    arrow_drop_down
-                                </span>
-                                <span>{liveNote?.dislikes?.count || 0}</span>
-                            </Button>
+                            <IconButton
+                                aria-label="like"
+                                sx={{
+                                    width: '60px',
+                                    height: '60px',
+                                }}
+                                onClick={() => dislikeNote(liveNote.id)}>
+                                <ArrowDropDownIcon sx={{ width: '40px', height: '40px', color: 'red' }} />
+                            </IconButton>
                         ) : (
-                            <Button onClick={() => dislikeNote(liveNote.id)}>
-                                <span className="material-symbols-outlined" style={{ color: 'gray' }}>
-                                    arrow_drop_down
-                                </span>
-                                <span>{liveNote?.dislikes?.count || 0}</span>
-                            </Button>
+                            <IconButton
+                                aria-label="like"
+                                sx={{
+                                    width: '60px',
+                                    height: '60px',
+                                }}
+                                onClick={() => dislikeNote(liveNote.id)}>
+                                <ArrowDropDownIcon sx={{ width: '40px', height: '40px', color: 'gray' }} />
+                            </IconButton>
                         )}
                     </div>
                     {liveNote?.creator === getDeviceId() && (
-                        <Button type="submit" color="error">
+                        <IconButton type="submit" color="error" sx={{ width: '60px', height: '60px' }}>
                             <DeleteIcon />
-                        </Button>
+                        </IconButton>
                     )}
                 </DialogActions>
             </Dialog>
