@@ -34,14 +34,14 @@ export default function AddDialog({ open, onClose }) {
                             timestamp: Date.now(),
                             creator: getDeviceId(),
                             likes: {
-                                count: 0,
-                                voters: {},
+                                count: 1,
+                                voters: {[getDeviceId()]: true },
                             },
                             dislikes: {
                                 count: 0,
                                 voters: {},
                             },
-                            expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+                            expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // expires in 7 days
                         });
                         onClose();
                     },

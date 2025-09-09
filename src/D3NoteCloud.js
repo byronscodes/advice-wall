@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as d3Force from 'd3-force';
 import { select } from 'd3-selection';
 import { drag } from 'd3-drag';
+import { quadtree as d3Quadtree } from 'd3-quadtree';
 import 'd3-transition'; // for smoother drag transitions if desired
 
 export default function D3NoteCloud({ notes, cloudMode, setSelectedNote }) {
@@ -11,7 +12,7 @@ export default function D3NoteCloud({ notes, cloudMode, setSelectedNote }) {
   const [dim, setDim] = useState({ width: 300, height: 300 });
 
   function getChargeStrength(mode) {
-    if (mode === 'clustered') return 10;
+    if (mode === 'clustered') return -30;
     if (mode === 'floating') return -10;
     return 0; // static
   }
@@ -51,7 +52,7 @@ export default function D3NoteCloud({ notes, cloudMode, setSelectedNote }) {
     svg.selectAll('*').remove();
 
     // Prepare node data
-    const nodes = notes.map(n => ({ id: n.id, ...n }));
+    const nodes = notes.map(n => ({ id: n.id, width: boxWidth, height: boxHeight, ...n }));
 
     // Text wrapping helper
     function wrapText(text, maxChars) {
@@ -91,42 +92,53 @@ export default function D3NoteCloud({ notes, cloudMode, setSelectedNote }) {
       return line;
     }
 
+    // Collision detection using quadtree
+    function rectangleCollide(padding) {
+      let nodes;
+      function force(alpha) {
+        const quad = d3Quadtree(nodes, d => d.x, d => d.y);
+        for (const d of nodes) {
+          quad.visit((q, x1, y1, x2, y2) => {
+            if (!q.data || q.data === d) return false;
+            // vector between the two node centers
+            let x = d.x - q.data.x;
+            let y = d.y - q.data.y;
+            const absX = Math.abs(x);
+            const absY = Math.abs(y);
+
+            // how much space they need (half-width + half-width + padding)
+            const xSpacing = padding + (d.width + q.data.width) / 2;
+            const ySpacing = padding + (d.height + q.data.height) / 2;
+
+            // if their boxes overlap
+            if (absX < xSpacing && absY < ySpacing) {
+              // push them apart along the smaller overlap axis
+              const overlapX = xSpacing - absX;
+              const overlapY = ySpacing - absY;
+
+              if (overlapX < overlapY) {
+                const shift = (overlapX * alpha) * (x < 0 ? -1 : 1);
+                d.x -= shift;
+                q.data.x += shift;
+              } else {
+                const shift = (overlapY * alpha) * (y < 0 ? -1 : 1);
+                d.y -= shift;
+                q.data.y += shift;
+              }
+            }
+            return false;
+          });
+        }
+      }
+      force.initialize = _ => (nodes = _);
+      return force;
+    }
+
     // Simulation setup
     const sim = d3Force.forceSimulation(nodes)
       .force('charge', d3Force.forceManyBody().strength(getChargeStrength(cloudMode)))
       .force('center', d3Force.forceCenter(width / 2, height / 2))
-      .force('collide', () => {
-        const padding = 4;                // gap you want around each box
-        const rx = boxWidth / 2 + padding;  // half‐width + padding
-        const ry = boxHeight / 2 + padding; // half‐height + padding
-        return alpha => {
-          for (let i = 0; i < nodes.length; i++) {
-            for (let j = i + 1; j < nodes.length; j++) {
-              const a = nodes[i];
-              const b = nodes[j];
-              const dx = b.x - a.x;
-              const dy = b.y - a.y;
-              if (Math.abs(dx) < rx && Math.abs(dy) < ry) {
-                // compute overlap on each axis
-                const overlapX = rx - Math.abs(dx);
-                const overlapY = ry - Math.abs(dy);
-                // push along the axis of *least* overlap
-                if (overlapX < overlapY) {
-                  const shift = overlapX * alpha;
-                  const dir = dx < 0 ? -1 : 1;
-                  a.x -= dir * shift;
-                  b.x += dir * shift;
-                } else {
-                  const shift = overlapY * alpha;
-                  const dir = dy < 0 ? -1 : 1;
-                  a.y -= dir * shift;
-                  b.y += dir * shift;
-                }
-              }
-            }
-          }
-        };
-      })
+      .force('collide', rectangleCollide(10))
       .force('bound', () => {
         // Confine nodes inside a circle of radius R
         const R = Math.min(width, height) / 2 - 30;
