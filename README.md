@@ -1,70 +1,78 @@
-# Getting Started with Create React App
+# Advice Wall
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack interactive note-sharing web application where users can post, view, and interact with short pieces of advice in a dynamic, data-driven visualization.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Features
+- Post new notes that appear instantly using **Firebase Realtime Database**.
+- Interactive **note cloud visualization** built with **D3.js**:
+  - Draggable notes
+  - Multiple layout modes
+  - Quadtree-based collision detection for efficient rendering
+- User engagement tools:
+  - Like / dislike system with per-device vote tracking
+  - Automatic expiration and deletion of notes
+- Responsive UI built with **React** and **Material-UI**, including dialogs for note creation, viewing, and deletion.
+- **Deployed on Firebase Hosting** with analytics tracking.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tech Stack
+- **Frontend**: React, Material-UI, D3.js
+- **Backend**: Firebase Realtime Database
+- **Hosting & Analytics**: Firebase Hosting
+- **Language**: JavaScript (ES6+)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Project Structure
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+src/
+├── components/ # React components (dialogs, note cloud, UI elements)
+├── hooks/ # Custom React hooks for state & Firebase integration
+├── services/ # Firebase database functions (CRUD operations)
+├── App.js # Main application entry point
+└── index.js # React DOM render
+```
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## ⚙Installation & Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/advice-wall.git
+   cd advice-wall
+   ```
+   
+2. Install dependencies:
+  ```bash
+  Copy code
+  npm install
+  ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Create a .env file and add your Firebase config:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  ```env
+  REACT_APP_API_KEY=your_api_key
+  REACT_APP_AUTH_DOMAIN=your_project_id.firebaseapp.com
+  REACT_APP_DATABASE_URL=https://your_project_id.firebaseio.com
+  REACT_APP_PROJECT_ID=your_project_id
+  REACT_APP_STORAGE_BUCKET=your_project_id.appspot.com
+  REACT_APP_MESSAGING_SENDER_ID=your_sender_id
+  REACT_APP_APP_ID=your_app_id
+  ```
 
-### `npm run eject`
+4. Run the app locally:
+  ```bash
+  Copy code
+  npm start
+  ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+5. Deploy to Firebase:
+  ```bash
+  Copy code
+  npm run build
+  firebase deploy
+  ```
