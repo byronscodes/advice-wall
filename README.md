@@ -1,6 +1,6 @@
 # Advice Wall
 
-A full-stack interactive note-sharing web application where users can post, view, and interact with short pieces of advice in a dynamic, data-driven visualization.
+A full-stack note-sharing web application where users can post, view, and interact with short pieces of advice.
 
 ---
 
@@ -9,33 +9,19 @@ A full-stack interactive note-sharing web application where users can post, view
 - Interactive **note cloud visualization** built with **D3.js**:
   - Draggable notes
   - Multiple layout modes
-  - Quadtree-based collision detection for efficient rendering
+  - Quadtree-based collision detection
 - User engagement tools:
   - Like / dislike system with per-device vote tracking
   - Automatic expiration and deletion of notes
 - Responsive UI built with **React** and **Material-UI**, including dialogs for note creation, viewing, and deletion.
-- **Deployed on Firebase Hosting** with analytics tracking.
+<!-- - **Deployed on Firebase Hosting** with analytics tracking. -->
 
 ---
 
 ## Tech Stack
 - **Frontend**: React, Material-UI, D3.js
-- **Backend**: Firebase Realtime Database
-- **Hosting & Analytics**: Firebase Hosting
-- **Language**: JavaScript (ES6+)
-
----
-
-## Project Structure
-
-```
-src/
-├── components/ # React components (dialogs, note cloud, UI elements)
-├── hooks/ # Custom React hooks for state & Firebase integration
-├── services/ # Firebase database functions (CRUD operations)
-├── App.js # Main application entry point
-└── index.js # React DOM render
-```
+- **Backend**: Firebase Realtime Database <!-- - **Hosting & Analytics**: Firebase Hosting -->
+- **Language**: JavaScript
 
 ---
 
@@ -70,9 +56,9 @@ src/
   npm start
   ```
 
-5. Deploy to Firebase:
+<!-- 5. Deploy to Firebase:
   ```bash
   Copy code
   npm run build
   firebase deploy
-  ```
+  ``` -->
